@@ -1,174 +1,62 @@
-\documentclass[dvipdfmx,a4paper]{jsarticle}
-\usepackage{mabst}
+%\documentstyle[epsf,twocolumn]{jarticle}       %LaTeX2.09仕様
+%\documentclass[twocolumn]{jarticle}     %pLaTeX2e仕様
+\documentclass[twocolumn]{jarticle}     %pLaTeX2e仕様
 
-\title{Title}
+\setlength{\topmargin}{-45pt}
+%\setlength{\oddsidemargin}{0cm} 
+\setlength{\oddsidemargin}{-7.5mm}
+%\setlength{\evensidemargin}{0cm} 
+\setlength{\textheight}{24.1cm}
+%setlength{\textheight}{25cm} 
+\setlength{\textwidth}{17.4cm}
+%\setlength{\textwidth}{172mm} 
+\setlength{\columnsep}{11mm}
 
-\newcommand{\ID}{00MM00}
-\newcommand{\Name}{Your Name}
-\newcommand{\Teacher}{Prof. Supervisor's Name}
+\kanjiskip=.07zw plus.5pt minus.5pt
 
-%\setlength{\oddsidemargin}{-2mm}  % 
+\usepackage{graphicx}
+\usepackage[dvipdfmx]{color}
+\usepackage{subcaption}
+\usepackage{enumerate}
+\usepackage{comment}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{diagbox}
+
 
 \begin{document}
-\maketitle
+\twocolumn[
+  \noindent
+  \hspace{1em}
 
-\section{Section 1}
+  \today
+  \hfill
+  \ \  西村昭賢 
 
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
+  \vspace{2mm}
+  \hrule
+  \begin{center}
+  {\Large \bf 情報工学英語演習 「AttentionIsAllYouNeed」の和訳}
+  \end{center}
+  \hrule
+  \vspace{3mm}
+]
 
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
+\section{??????}
+?????
 
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-
-\section{Seciton 2}
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample \cite{publication1,hogehoge}.
-
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-
-sample sample sample sample sample sample \cite{publication1,hogehoge}.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-
-sample sample sample sample sample sample \cite{publication1,hogehoge}.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample.
-sample sample sample sample sample sample \cite{publication1,hogehoge}.
+\section{?????}
 
 
+\section{???}
 
-% Your publications
-\begin{thepubbibliography}{99}
 
-\pubbibitem{publication1}
- Your name: title, publisher, year.
+\section{???}
 
-\end{thepubbibliography}
 
-% References
-\begin{thebibliography}{99}
-
-\bibitem{hogehoge}
-John Smith: Some book, publisher, 20xx.
-
-\end{thebibliography}
+%index.bibはtexファイルと同階層に置く
+%ちゃんと\citeしないと表示されない(1敗)
+\bibliography{index.bib}
+\bibliographystyle{junsrt}
 
 \end{document}
