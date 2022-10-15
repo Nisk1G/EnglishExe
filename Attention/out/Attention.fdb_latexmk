@@ -1,0 +1,23 @@
+# Fdb version 3
+["dvipdf"] 0 "out/Attention.dvi" "out/Attention.pdf" "out/Attention" 0
+  "out/Attention.dvi" 0 -1 0 "latex"
+  (generated)
+  "out/Attention.pdf"
+["latex"] 1665836189 "/home/nishimura/ドキュメント/EnglishExe/Attention/Attention.tex" "out/Attention.dvi" "Attention" 1665836189
+  "/etc/texmf/web2c/texmf.cnf" 1664866142 475 c0e671620eb5563b2130f56340a5fde8 ""
+  "/home/nishimura/ドキュメント/EnglishExe/Attention/Attention.tex" 1665836189 6077 12f8b9c49a596043e553910b82468da9 ""
+  "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
+  "/usr/share/texlive/texmf-dist/fonts/tfm/ptex-fonts/jis/jis.tfm" 1463434352 468 53f854284f6afa6c36aaa2d1090ecc12 ""
+  "/usr/share/texlive/texmf-dist/fonts/tfm/ptex-fonts/standard/tmin10.tfm" 1463434352 856 39c171483fe1bb7d0e1368980c0c205b ""
+  "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmr8.tfm" 1136768653 1292 21c1c5bfeaebccffdb478fd231a0997d ""
+  "/usr/share/texlive/texmf-dist/tex/platex/jsclasses/jsarticle.cls" 1580683346 60623 359a5f3daadb4509ddbf472557e5a531 ""
+  "/usr/share/texlive/texmf-dist/tex/platex/jsclasses/jslogo.sty" 1564091273 6025 c6eb7b869bc73b37a7116f5af977422f ""
+  "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1581979058 38841 ce3692aa899bb693b90b87eaa5d4d84e ""
+  "/usr/share/texmf/web2c/texmf.cnf" 1581979058 38841 ce3692aa899bb693b90b87eaa5d4d84e ""
+  "/var/lib/texmf/web2c/eptex/platex.fmt" 1664866273 10600538 2a413ffdaa295c0e9800a3ee05911c62 ""
+  "mabst.sty" 0 -1 0 ""
+  "out/Attention.aux" 1665836189 8 a94a2480d3289e625eea47cd1b285758 ""
+  "out/mabst.sty" 0 -1 0 ""
+  (generated)
+  "out/Attention.log"
+  "out/Attention.dvi"
