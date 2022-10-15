@@ -31,7 +31,7 @@
 
   \today
   \hfill
-  \ \  西村昭賢 
+  \ \  学籍番号1201201100 西村昭賢 
 
   \vspace{2mm}
   \hrule
@@ -42,17 +42,61 @@
   \vspace{3mm}
 ]
 
-\section{??????}
-?????
+\section*{Abstruct}
+今までの主要なsequence transduction modelは,エンコーダーとデコーダーを含む
+複雑なRNNやCNNに基づいていた.最も良いパフォーマンスであったモデルも,エンコーダーとデコーダーをアテンションの仕組みを用いて接続しているモデルであった.\par
+私達は,RNNやCNNを用いず,アテンションのみからなるTransformerと呼ばれる新しい簡潔なモデルを提案する.2回の翻訳実験の結果,Transformerは今までのモデルより優れており,更には,より並列化が可能で学習の時間も少ないことが分かった.
+TransformerはWMT2014英独翻訳タスクにおいて,「プロの翻訳者の訳と近ければ近いほどその機械翻訳の精度は高い」という考え方に基づく機械翻訳の評価方法であるBLEUスコアで28.4BLEUを記録した.これは,複数のモデルを融合させて1つの学習モデルを生成するアンサンブル学習を含めたこれまでの最高記録を2BLEU上回る結果であった.また、WMT2014英仏翻訳タスクにおいては、8個のGPUを用いた3.5日の学習というこれまでの最先端のモデルの学習よりも遥かに少ないコストで,41.0BLEUという単一モデルの最高記録を打ち立てた.
 
-\section{?????}
+%TODO sequence transduction modelの自然な訳、時系列分析モデル?
 
 
-\section{???}
+\section{Introduction}
+RNN,特にRNNにおいて文章の長期的な依存関係を学習できるようにしたLSTMやgated RNNは,言語モデルや機械翻訳などのSequence 問題への最適な手法として確固たる地位を築いていた.
+それ以来,Recurrent言語モデルとエンコーダー-デコーダー構造の限界を押し上げる数々の努力がなされてきた.
+リカレントモデルでは,通常,入力と出力の時系列データの位置に沿って計算を行う.
+\section{BackGround}
 
 
-\section{???}
+\section{Model Architecture}
 
+\subsection{Encoder and Decoder Stacks}
+
+\subsection{Attention}
+
+\subsubsection{Scaled Dot-Product Attention}
+
+\subsubsection{Multi-Head Attention}
+
+\subsubsection{Applications of Attention in our Model}
+
+\subsection{Position-wise Feed-Forward Networks}
+
+\subsection{Embeddings and Softmax}
+
+\subsection{Positional Encoding}
+
+\section{Why Self-Attention}
+
+\section{Training}
+
+\subsection{Training Data and Batching}
+
+\subsection{Hardware and Schedule}
+
+\subsection{Optimizer}
+
+\subsection{Regularization}
+
+\section{Results}
+
+\subsection{Machine Translation}
+
+\subsection{Model Variations}
+
+\section{conclusion}
+
+%TODO 用語説明的な部分の書き方調べる
 
 %index.bibはtexファイルと同階層に置く
 %ちゃんと\citeしないと表示されない(1敗)

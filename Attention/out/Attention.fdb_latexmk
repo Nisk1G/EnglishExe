@@ -1,23 +1,24 @@
 # Fdb version 3
-["bibtex out/Attention"] 1665840323 "out/Attention.aux" "out/Attention.bbl" "out/Attention" 1665841353
+["bibtex out/Attention"] 1665850523 "out/Attention.aux" "out/Attention.bbl" "out/Attention" 1665850524
   "index.bib" 1665840163 525 b09061bb9c341b0b6b7b6c04135df0c3 ""
   "junsrt.bst" 0 -1 0 ""
-  "out/Attention.aux" 1665841345 407 75ed06e8c489278a27575d53d36c8f8a "latex"
+  "out/Attention.aux" 1665850523 2322 b382e1b1fb245a1e7569bf4c5bb96386 "latex"
   (generated)
-  "out/Attention.bbl"
   "out/Attention.blg"
-["dvipdf"] 1665841345 "out/Attention.dvi" "out/Attention.pdf" "out/Attention" 1665841353
-  "out/Attention.dvi" 1665841345 972 7dbcfac0543e021781a5d57f1ef10364 "latex"
+  "out/Attention.bbl"
+["dvipdf"] 1665850524 "out/Attention.dvi" "out/Attention.pdf" "out/Attention" 1665850524
+  "out/Attention.dvi" 1665850523 4732 d0cc7d459e8bad60bd68e3345562cf52 "latex"
   (generated)
   "out/Attention.pdf"
-["latex"] 1665841345 "/home/nishimura/document/EnglishExe/Attention/Attention.tex" "out/Attention.dvi" "Attention" 1665841353
+["latex"] 1665850523 "/home/nishimura/document/EnglishExe/Attention/Attention.tex" "out/Attention.dvi" "Attention" 1665850524
   "/etc/texmf/web2c/texmf.cnf" 1664866142 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/nishimura/document/EnglishExe/Attention/Attention.tex" 1665841353 1190 4153f606a0703ec8925e31da61b3b4ac ""
+  "/home/nishimura/document/EnglishExe/Attention/Attention.tex" 1665850522 3791 1cde53f1f4de8443bd05bff01283169c ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/ptex-fonts/standard/goth10.tfm" 1463434352 1196 5981e79c37b2cfd27b3612a6783cd4b6 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/ptex-fonts/standard/min10.tfm" 1463434352 1196 1be730212205a270378fba11a44765dc ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/ptex-fonts/standard/tgoth10.tfm" 1463434352 856 7404843a5f798859944d7973a47821d5 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/ptex-fonts/standard/tmin10.tfm" 1463434352 856 39c171483fe1bb7d0e1368980c0c205b ""
+  "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1136768653 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm" 1136768653 1324 c910af8c371558dc20f2d7822f66fe64 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmr12.tfm" 1136768653 1288 655e228510b4c2a1abe905c368440826 ""
   "/usr/share/texlive/texmf-dist/tex/latex/caption/caption.sty" 1578175482 57350 70b0c251b0022f1db12ad7dd4c1aa547 ""
@@ -61,9 +62,9 @@
   "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1581979058 38841 ce3692aa899bb693b90b87eaa5d4d84e ""
   "/usr/share/texmf/web2c/texmf.cnf" 1581979058 38841 ce3692aa899bb693b90b87eaa5d4d84e ""
   "/var/lib/texmf/web2c/eptex/platex.fmt" 1664866273 10600538 2a413ffdaa295c0e9800a3ee05911c62 ""
-  "Attention.tex" 1665841353 1190 4153f606a0703ec8925e31da61b3b4ac ""
-  "out/Attention.aux" 1665841345 407 75ed06e8c489278a27575d53d36c8f8a "latex"
-  "out/Attention.bbl" 1665840323 49 0eba253fc001332e731e8aba3f23127b "bibtex out/Attention"
+  "Attention.tex" 1665850522 3791 1cde53f1f4de8443bd05bff01283169c ""
+  "out/Attention.aux" 1665850523 2322 b382e1b1fb245a1e7569bf4c5bb96386 "latex"
+  "out/Attention.bbl" 1665850523 49 0eba253fc001332e731e8aba3f23127b "bibtex out/Attention"
   (generated)
   "out/Attention.log"
   "out/Attention.aux"

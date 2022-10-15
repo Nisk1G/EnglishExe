@@ -1,0 +1,7 @@
+翻訳の際の参考文献
+
+https://qiita.com/omiita/items/07e69aef6c156d23c538
+
+https://towardsdatascience.com/lstm-recurrent-neural-networks-how-to-teach-a-network-to-remember-the-past-55e54c2ff22e
+
+https://www.v7labs.com/blog/ensemble-learning#h1
