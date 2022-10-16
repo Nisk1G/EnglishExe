@@ -81,7 +81,10 @@ End-to-End memory NetworksはRNNの代わりに再帰的なAttentionを元にし
 
 
 \section{Model Architecture}
-最も優位性のあるsequence transduction modelsはエンコーダー-デコーダー構造を有している.エンコーダーは配列で表現される入力($x_\mathrm{1}$,...,$x_\mathrm{n}$)を配列
+最も優位性のあるsequence transduction modelsはエンコーダー-デコーダー構造を有している.エンコーダーは配列で表現される入力($x_\mathrm{1}$,...,$x_\mathrm{n}$)を配列\bm{$z$}=($z_\mathrm{1}$,...,$z_\mathrm{n}$)に変換する.
+デコーダーは\bm{$z$}から出力として配列($y_\mathrm{1}$,...,$y_\mathrm{n}$)を1要素ずつ出力する.
+このステップで,モデルが生成する要素はこれまでに生成した要素のみに依存する自己回帰モデルであり,直前に生成された要素を新しく入力として次の要素を生成する.\par
+Transformerは図1の左半分と右半分に示すように,全体としてはエンコーダー-デコーダー構造を踏襲しつつ,self-attention層とpoint-wise全結合層を積み重ねた層を使用している.
 
 \subsection{Encoder and Decoder Stacks}
 
@@ -117,7 +120,7 @@ End-to-End memory NetworksはRNNの代わりに再帰的なAttentionを元にし
 
 \subsection{Model Variations}
 
-\section{conclusion}
+\section{Conclusion}
 
 %TODO 用語説明的な部分の書き方調べる
 
