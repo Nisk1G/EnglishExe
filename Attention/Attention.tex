@@ -86,8 +86,16 @@ End-to-End memory NetworksはRNNの代わりに再帰的なAttentionを元にし
 このステップで,モデルが生成する要素はこれまでに生成した要素のみに依存する自己回帰モデルであり,直前に生成された要素を新しく入力として次の要素を生成する.\par
 Transformerは図1の左半分と右半分に示すように,全体としてはエンコーダー-デコーダー構造を踏襲しつつ,self-attention層とpoint-wise全結合層を積み重ねた層を使用している.
 
-\subsection{Encoder and Decoder Stacks}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=75mm]{assets/Figure1.eps}
+  \caption{図1: Transformerのモデルアーキテクチャ}
+  \label{fig:vote_Accuracy}
+\end{figure}
 
+
+\subsection{Encoder and Decoder Stacks}
+？？？
 \subsection{Attention}
 
 \subsubsection{Scaled Dot-Product Attention}
