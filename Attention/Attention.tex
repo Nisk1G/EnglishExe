@@ -23,6 +23,8 @@
 \usepackage{multirow}
 \usepackage{diagbox}
 \usepackage{bm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
 
 
 
@@ -89,8 +91,8 @@ Transformerは図1の左半分と右半分に示すように,全体としては�
 \begin{figure}[ht]
   \centering
   \includegraphics[width=75mm]{assets/Figure1.eps}
-  \caption{Transformerのモデルアーキテクチャ}
-  \label{fig:vote_Accuracy}
+  \caption{Transformerのモデルアーキテクチャ.}
+  \label{Figure1}
 \end{figure}
 
 
@@ -98,20 +100,89 @@ Transformerは図1の左半分と右半分に示すように,全体としては�
 エンコーダー: 6層からなり,各層は全く同じ構造である.それぞれの層は2つの下位層を持ち,下位層の後には残差接続や標準化が行われている.
 よって,下位層自身の出力をSublayer($x$)として,下位層全体としての出力はLayerNorm($x$+Sublayer($x$))となる.残差接続を容易にするために,すべての下位層,embedding layersも出力の次元を$d_\mathrm{model}$=512としている.\par
 \par
-デコーダー: デコーダーも同一の6層からなる.エンコーダーの2つの下位層に加えて,エンコーダーの出力を入力として受ける3つ目の下位層を加えている.エンコーダーと同じく,下位層の後には残差接続や標準化が行われている.ただ,self-attention下位層は改良しており,後続の要素が影響しないようにしている.このマスキングと,出力が1要素ごと補われることを組み合わせることで,マスキングにより$i$での予測が$i$未満での既知の出力のみに依存することが保証される
+デコーダー: デコーダーも同一の6層からなる.エンコーダーの2つの下位層に加えて,エンコーダーの出力を入力として受ける3つ目の下位層を加えている.エンコーダーと同じく,下位層の後には残差接続や標準化が行われている.ただ,self-attention下位層は改良しており,後続の要素が影響しないようにしている.このマスキングと,出力が1要素ごと補われることを組み合わせることで,マスキングにより地点$i$での予測が地点$i$未満での既知の出力のみに依存することが保証される.
+
 \subsection{Attention}
+アテンションの仕組みは,クエリとキーとキー値のセットを出力へマッピングし,クエリやキー,キー値,出力はすべてベクトルである.出力はキー値の重み付き和として計算され,それぞれのキー値へ割り当てられる重みはクエリとクエリに対応するキーからの変換関数で計算される.
 
 \subsubsection{Scaled Dot-Product Attention}
+私が独自に考案したアテンションを"Scaled Dot-Product Attention"と呼ぶ.図2にScaled Dot-Product Attentionのアーキテクチャを示す.\par
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=75mm]{assets/Figure2.eps}
+
+  \caption{(左)Scaled Dot-Product Attention. (右)複数のアテンション層が並列に構成されているMulti-Head Attention.}
+  \label{Figure2}
+\end{figure}
+
+
+入力はクエリと次元$d_\mathrm{k}$のキー,次元$d_\mathrm{v}$のキー値からなる.クエリとキーの内積を計算し,それを$\sqrt{d_\mathrm{k}}$で割り,キー値の重みを得るためにsoftmax関数を適用する.
+実際にはクエリを行列$Q$としてまとめて同時に計算している.キーやキー値も同様に行列$K$,$V$にまとめて計算している.行列による出力は(1)式のように表せる.
+
+\begin{equation}
+  \mathrm{Attention}(Q,K,V) = \mathrm{softmax}(\frac{QK^T}{\sqrt{d_\mathrm{k}}})V
+\end{equation}
+
+\par
+
+最も一般的に利用されるAttentionとしてはadditive attentionとdot-product attentionの2つがある.Dot-product attentionは,Scaled Dot-Product Attentionから$\sqrt{d_\mathrm{k}}$で割る処理を除いたものである.Additive attentionは一つの隠れ層を持つfeed-forward networkを用いて変換関数を計算している.2つのAttentionは理論的には似ているが,高度に最適化された行列積のコードを内包しているためdot-product attentionのほうが計算が遥かに早く,メモリ効率も良い.\par
+$d_\mathrm{k}$が小さい値である時はこの2つのAttentionは同様に作用するが,$d_\mathrm{k}$が大きい値である時には,Additive attentionは標準化をしないdot-product attentionより性能が良くなる.私達は,$d_\mathrm{k}$が大きい値である時に,内積の値が急激に増加し,softmax関数の勾配消失が起こると考え,それを防ぐために内積を$\frac{1}{\sqrt{d_\mathrm{k}}}$で標準化している.
 
 \subsubsection{Multi-Head Attention}
+次元$d_\mathrm{model}$におけるキーとキー値とクエリを用いた単一のattention関数を使用する代わりに,クエリとキーとキー値に$h$回線形射影を行い,次元を$d_\mathrm{k}$,$d_\mathrm{k}$,$d_\mathrm{v}$にそれぞれ削減したほうが都合が良いと判明した.
+射影したクエリ,キー,キー値それぞれに対して,Attention関数を並列に実行し,次元$d_\mathrm{v}$の出力を得る.それらをConcat層で連結し,もう一度線形射影して最終的な出力を得る.図2にこの一連の過程を示す.
+\par
+Multi-Head Attentionにより,異なる要素の異なる部分ベクトル空間を見ることができる.single attention headでは,平均化によりこのようなことはできない.
+\par
+\begin{eqnarray*}
+  \mathrm{MultiHead}(Q,K,V)&  = & \mathrm{Concat}(head_\mathrm{1},...,head_\mathrm{h})W^O   \\
+  ここで, head_\mathrm{i} & = & \mathrm{Attention}(QW_\mathrm{i}^Q,KW_\mathrm{i}^K,VW_\mathrm{i}^V)
+\end{eqnarray*}
+
+射影関数のパラメータの行列は,
+$W_\mathrm{i}^Q \in \mathbb{R} ^ {{d_\mathrm{model}} \times {d_\mathrm{k}}}$,\par
+$W_\mathrm{i}^K \in \mathbb{R} ^ {{d_\mathrm{model}} \times {d_\mathrm{k}}}$,
+$W_\mathrm{i}^V \in \mathbb{R} ^ {{d_\mathrm{model}} \times {d_\mathrm{v}}}$と\par
+$W_\mathrm{i}^O \in \mathbb{R} ^ {{hd_\mathrm{v}} \times {d_\mathrm{model}}}$である.
+
+本研究では,$h=8$の並列のattention層を用いて,次元を
+$d_\mathrm{k} = d_\mathrm{v} = d_\mathrm{model}/h = 64$とした.
+次元の削減により,総計算コストを,次元の削減を行わなかった場合の単一のattentionと同等まで削減することができた.
 
 \subsubsection{Applications of Attention in our Model}
+Transformerでは,multi-head attentionを以下の3つの方法で採用している.
+\begin{itemize}
+  \item "encoder-decoder attention"層では,クエリは直前のデコーダー層から生まれ,キーとキー値はエンコーダーの出力から生まれる.デコーダー内のすべての要素が入力文のすべての要素を見ることができる.これは,sequence to sequenceモデルの典型的なencoder-decoder attentionを模倣している.
+  \item エンコーダはself-attention層を含んでいる.self-attention層では,キー,キー値,クエリの全てが,エンコーダー内の一つ前の層の出力から生まれている.エンコーダー内のそれぞれの要素は,エンコーダーの一つ前の層の,その要素までの全ての要素を見ることができる.
+  \item 同様に,デコーダー内のself-attention層も,デコーダーの全層の要素を参照することができるが,自動回帰的な特性を保持するために,左向きへの情報の流出を防がなければならない.すなわち,翻訳済の単語に影響が出ないようにしなければ行けない.私達はscaled dot-product attentionの中で,不当な接続に相当する部分を-$\infty$にマスキングして,softmax層の入力として与えることで,これを実現している.図2にこの過程を示している.
+\end{itemize}
 
 \subsection{Position-wise Feed-Forward Networks}
+Attentionの下位層に加えて,エンコーダーとデコーダーのそれぞれの層には,完全に連結したfeed-forward networkが含まれている.feed-forward networkは,2つの線形変換の間にReLU関数を適用した形となっている.
+
+\begin{equation}
+  \mathrm{FFN}(x) = \mathrm{max}(0,xW_\mathrm{1}+b_\mathrm{1})W_\mathrm{2} + b_\mathrm{2}
+\end{equation}
+
+線形変換は異なる要素に対しても同じ値を掛けるのに対して,層を変えることに異なるパラメータを用いる.言い換えると,カーネルサイズが1の2つの畳み込みとして捉えることができる.
+入出力の次元は$d_\mathrm{model} = 512$とし,feed-forward network内では次元は$d_\mathrm{ff} = 2048$としている.
 
 \subsection{Embeddings and Softmax}
+他のsequence transduction modelと同様に,学習済みのembeddingを用いて入力と出力のトークンを次元$d_\mathrm{model}$のベクトルに変換する.また,一般的な学習済みの線形変換とsoftmax関数を用いてデコーダーの出力を予測済みのnext-tokenの予測確率に変換している.私達のモデルは,2つのembedding層とsoftmax層の前の線形変換で同じ重み行列を使用している.また,embedding層では$\sqrt{d_\mathrm{model}}$を掛けている.
 
 \subsection{Positional Encoding}
+私達のモデルはRNNやCNNを含んでいないため,モデルが要素の順番を利用するために,絶対的であれ,相対的であれ何らかの要素の順番の情報を定義する必要があった.結果として,"positional encoder"を入力のembedding層に付け加え,エンコーダーとデコーダーの最下層に入れることとした.embedding層との加算を行うために,positional encodingの次元はembeddingと同じ$d_\mathrm{model}$とした.\par
+本研究では,positional encodingとして別々の周波数を持つsin関数,cos関数を用いた.
+
+\begin{eqnarray*}
+  PE_{(pos,2i)} &= &sin(pos/10000^{2i/d_\mathrm{model}}) \\
+  PE_{(pos,2i+1)} &= &cos(pos/10000^{2i/d_\mathrm{model}})
+\end{eqnarray*}
+
+ここで,$pos$は要素の位置,$i$は次元である.つまり,position encodingのそれぞれの次元は正弦波に該当する.波長は$2\pi$から$10000・2\pi$まで段階的に増加していく.この関数を採用した理由は,モデルが相対的な位置から参照できるように簡単に学習できると仮設を立てたためである.なぜなら,任意の定数オフセット$k$において,$PE_{pos+k}$は$PE_{pos}$の線形関数として表すことができるからだ.\par
+別の論文の学習済みのpositional embeddingを用いた実験を行ったところ,本論文と別論文の結果はほぼ等しくなった.そこで,学習時よりもより長いデータに対しても対応できると判断し正弦波verを採用した.
+
 
 \section{Why Self-Attention}
 
