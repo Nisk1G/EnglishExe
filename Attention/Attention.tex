@@ -25,6 +25,7 @@
 \usepackage{bm}
 \usepackage{amssymb}
 \usepackage{amsfonts}
+\usepackage{booktabs}
 
 
 
@@ -237,7 +238,7 @@ optimizerとしてAdamを用いた.パラメータは$\beta_\mathrm{1} = 0.9$,$\
   lrate = d_\mathrm{model}^{-0.5}・\mathrm{min}(step\_num^{-0.5},step\_num・warmup\_steps^{-1.5})
 \end{equation}
 
-学習の際,学習率は$warmup_step$まで線形的に増えていくが,それ以降のステップでは,ステップ数の平方根の逆数に比例して減少していく.
+学習の際,学習率は$warmup\_step$まで線形的に増えていくが,それ以降のステップでは,ステップ数の平方根の逆数に比例して減少していく.
 
 \subsection{Regularization}
 実験の際,3つの正則化を採用した.
@@ -254,15 +255,51 @@ optimizerとしてAdamを用いた.パラメータは$\beta_\mathrm{1} = 0.9$,$\
 \subsection{Machine Translation}
 WMT2014英独翻訳において,表2に示すように,bigモデルがアンサンブルを含む既知のモデルに2.0BLEU以上の差をつけて28.4BLEUという最高記録を打ち立てた.表3の下部にこのモデルの構成要素を示す.学習は8個のP100 GPUで3.5日間かかった.baseモデルは,既存のモデルやアンサンブルに比べて良いBLEUスコアを残している上に,既存のモデルに比べて数分の1の計算コストで学習を行っている.
 \par
-WMT2014英仏翻訳タスクに関して,bigモデルでは41.0BLEUスコアを記録している.既存の単一のモデルの全てより良いスコアであり,既存の最良のモデルに比べ1/4以下の学習コストで学習を行っている.bigモデルは英仏翻訳タスクに関しては,Dropout rate $P_drop$を0.3の代わりに0.1と設定している.
+WMT2014英仏翻訳タスクに関して,bigモデルでは41.0BLEUスコアを記録している.既存の単一のモデルの全てより良いスコアであり,既存の最良のモデルに比べ1/4以下の学習コストで学習を行っている.bigモデルは英仏翻訳タスクに関しては,Dropout rate $P_{drop}$を0.3の代わりに0.1と設定している.
 \par
 
 baseモデルでは,10分感覚で保存されるチェックポイントの最後の5回分を平均化したモデルとした.bigモデルは最後の20回分を平均化した.また,beam sizeを4,Length Penaltyの$\alpha=0.6$としてbeam searchを使用している.これらのハイパーパラメータは開発セットの実験後に決定した.
 推論時の出力の最大長は入力の長さ+50までとし,可能なら早めに打ち切るようにした.
 \par
-表2には
+表2に,本研究のモデルと参考文献のモデルとの翻訳の質と計算コストを示す.
+
+\begin{table}[h]
+  \caption{Transformerは,英独翻訳,英仏翻訳の2014年最新のタスクで以前の最先端のモデルに比べ,僅かな計算コストで良いBLEUスコアを残した.}
+  \label{table:Transformer}
+  \centering
+   \begin{tabular}{lcccc}
+    \toprule             % --- booktabs: 上の罫線 ---
+    model & \multicolumn{2}{c}{BLEU} & \multicolumn{2}{l}{Training Cost(FLOPs)}\\
+    \cmidrule(lr){2-3}
+    \cmidrule(lr){4-5}
+     & EN-DE & EN-FR & EN-DE & EN-FR \\
+    \midrule             % --- booktabs: 中間の罫線 ---
+    ByteNet & 23.75 & & & \\
+    Deep-Att + PosUnk & & 39.2 & & 1.0・$10^{20}$ \\
+    GNMT + RL & 24.6 & 39.92 & 2.3・$10^{19}$ & 1.4・$10^{20}$ \\
+    ConvS2S & 25.16 & 40.46 & 9.6・$10^{18}$ & 1.4・$10^{20}$ \\
+    MoE & 26.03 & 40.56 & 2.0・$10^{19}$ & 1.2・$10^{20}$ \\
+    \hline
+    Deep-Att + PosUnk Ensemble & & 40.4 & & 8.0・$10^{20}$ \\
+    GNMT + RL Ensemble & 26.30 & 41.16 & 7.7・$10^{20}$ & 1.2・$10^{20}$ \\
+    ConvS2S Ensemble & 26.36 & \textbf{41.29} & 7.7・$10^{19}$ & 1.2・$10^{21}$ \\
+    \hline
+    Transformer(base model) & 27.3 & 38.1 & \multicolumn{2}{c}{\bf{3.3・$\mathbf{10^{18}}$}} \\
+    Transformer(big) & \textbf{28.4} & \textbf{41.0} &  \multicolumn{2}{c}{2.3・$10^{19}$}\\ 
+    \bottomrule          % --- booktabs: 底の罫線 ---
+   \end{tabular}
+ \end{table}
+
+Training Costとして,コンピュータが1秒間に処理可能な浮動小数点演算の回数を表したFLOPsを用いており,学習時間,GPUの使用数,それぞれのGPUにおける処理可能な単精度浮動小数点の推定値をかけ合わせて計算した.
 
 \subsection{Model Variations}
+Transformerの各構成要素を評価するために,baseモデルを様々に変化させ,Newest2013の開発セットにおける英独翻訳タスクでの性能を評価した.前節で述べたビームサーチを用いたが,チェックポイントの平均化は行わなかった.表3に結果を示す.
+
+
+% TODO 表3作る
+
+表3の(A)行では,3.2.2節で述べた通り計算量を一定にしたまま,Multi-Head Attentionのheadsの数$h$,キーやキー値の次元$d_\mathrm{k}$,$d_\mathrm{v}$を変化させた結果を示している.$h=1$の時は,最適なパラメータ設定のときに比べ,0.9ほどBLEUスコアが低くなっており,$h=32$など多すぎる場合もスコアが低くなっている.\par
+(B)行では,Attentionのキーの次元$d_\mathrm{k}$の影響を観察した.結果として,優劣をつけるのは難しく,Scaled Dot-Product Attentionより良い変換関数があるかもしれない.(C),(D)行では,エンコーダー,デコーダーの層の数$N$,モデルの入出力の次元$d_\mathrm{model}$,Feed-Forward Networks内の次元$d_\mathrm{ff}$,DropoutやLabelSmoothingのパラメータ$P_{drop}$,$\epsilon_{ls} = 0.1$を変化させて実験を行った結果を示している.想定通り,パラメータを増やしモデルの規模を大きくするほどよい結果が得られ,またDropout処理は過学習を避けるために有効であった.行(E)では,本研究の正弦波を用いたpositional encodingを他の研究のpositional encodingと置き換えた結果を示しており,大きな違いは見られなかった.
 
 \section{Conclusion}
 
