@@ -46,17 +46,20 @@
   \hrule
   \vspace{3mm}
 
+\section*{Author}
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aiden N.Gomez, Lukasz Kaizer, Illia Polosukhin\cite{Transformer}
+
 \section*{Abstruct}
 今までの主要なsequence transduction modelは,エンコーダーとデコーダーを含む
 複雑なRNNやCNNに基づいていた.最も良いパフォーマンスであったモデルも,エンコーダーとデコーダーをアテンションの仕組みを用いて接続しているモデルであった.\par
 私達は,RNNやCNNを用いず,アテンションのみからなるTransformerと呼ばれる新しい簡潔なモデルを提案する.2回の翻訳実験の結果,Transformerは今までのモデルより優れており,更には,より並列化が可能で学習の時間も少ないことが分かった.
-TransformerはWMT2014英独翻訳タスクにおいて,「プロの翻訳者の訳と近ければ近いほどその機械翻訳の精度は高い」という考え方に基づく機械翻訳の評価方法であるBLEUスコアで28.4BLEUを記録した.これは,複数のモデルを融合させて1つの学習モデルを生成するアンサンブル学習を含めたこれまでの最高記録を2BLEU上回る結果であった.また、WMT2014英仏翻訳タスクにおいては、8個のGPUを用いた3.5日の学習というこれまでの最先端のモデルの学習よりも遥かに少ないコストで,41.0BLEUという単一モデルの最高記録を打ち立てた.
+TransformerはWMT2014英独翻訳タスクにおいて,「プロの翻訳者の訳と近ければ近いほどその機械翻訳の精度は高い」という考え方に基づく機械翻訳の評価方法であるBLEUスコア\cite{BLEU}で28.4BLEUを記録した.これは,複数のモデルを融合させて1つの学習モデルを生成するアンサンブル学習\cite{ensemble}を含めたこれまでの最高記録を2BLEU上回る結果であった.また、WMT2014英仏翻訳タスクにおいては、8個のGPUを用いた3.5日の学習というこれまでの最先端のモデルの学習よりも遥かに少ないコストで,41.0BLEUという単一モデルの最高記録を打ち立てた.
 
 %TODO sequence transduction modelの自然な訳、時系列分析モデル?
 
 
 \section{Introduction}
-RNN,特にRNNにおいて文章の長期的な依存関係を学習できるようにしたLSTMやgated RNNは,言語モデルや機械翻訳などのSequence 問題への最適な手法として確固たる地位を築いていた.
+RNN,特にRNNにおいて文章の長期的な依存関係を学習できるようにしたLSTM\cite{LSTM}やgated RNN\cite{GRU}は,言語モデルや機械翻訳などのSequence 問題への最適な手法として確固たる地位を築いていた.
 それ以来,Recurrent言語モデルとエンコーダー-デコーダー構造の限界を押し上げる数々の努力がなされてきた.
 \par
 リカレントモデルでは,通常,入力と出力の時系列データの時間的な位置に沿って計算を行う.
