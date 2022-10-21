@@ -298,10 +298,67 @@ Transformerの各構成要素を評価するために,baseモデルを様々に�
 
 % TODO 表3作る
 
+\begin{table}[htb]
+  \centering
+  \caption{Transformerアーキテクチャの様々な変化.表に乗せていない変数はbaseモデルと同一である.表のPPLはbyte-pair encodingによる単語列当たりで計算しており,単語あたりのPPLと比較すべきではない.}
+  \begin{tabular}{c|ccccccccc|ccc}
+      \toprule
+        & $N$ & $d_\mathrm{model}$ & $d_\mathrm{ff}$ & $h$ & $d_\mathrm{k}$ & $d_\mathrm{v}$ & $P_\mathrm{drop}$ & $\epsilon_\mathrm{ls}$ 
+        & \begin{tabular}{c}
+          train\\steps 
+        \end{tabular}
+        & \begin{tabular}{c}
+          PPL\\(dev)
+        \end{tabular}
+        & \begin{tabular}{c}
+          BLEU\\(dev)
+        \end{tabular}
+        & \begin{tabular}{c}
+          params\\$×10^6$
+        \end{tabular}
+        \\ 
+      \midrule
+      base & 6 & 512 & 2048 & 8 & 64 & 64 & 0.1 & 0.1 & 100K & 4.92 & 25.8 & 65 \\
+      \midrule
+      \multirow{4}{*}{(A)} & & & & 1 & 512 & 512 & & & & 5.29 & 24.9 &         \\
+                         & & & & 4 & 128 & 128 & & & & 5.00 & 25.5 &        \\
+                         & & & & 16 & 32 & 32 & & & & 4.91 & 25.8 &        \\
+                         & & & & 32 & 16 & 16 & & & & 5.01 & 25.4 &        \\
+      \midrule
+      \multirow{2}{*}{(B)} & & & & & 16 & & & & & 5.16 & 25.1 & 58        \\
+                         & & & & & 32 & & & & & 5.01 & 25.4 & 60        \\
+      \midrule
+      \multirow{7}{*}{(C)} & 2 & & & & & & & & & 6.11 & 23.7 & 36        \\
+                         & 4 & & & & & & & & & 5.19 & 25.3 & 50        \\
+                         & 6 & & & & & & & & & 4.88 & 25.5 & 80        \\
+                         & & 256 & & & 32 & 32 & & & & 5.75 & 24.5 & 28        \\
+                         & & 1024 & & & 128 & 128 & & & & 4.66 & 26.0 & 168        \\
+                         & & & 1024 & & & & & & & 5.12 & 25.4 & 53        \\
+                         & & & 4096 & & & & & & & 4.75 & 26.2 & 90        \\
+      \midrule
+      \multirow{4}{*}{(D)} & & & & & & & 0.0 & & & 5.77 & 24.6 &         \\
+                         & & & & & & & 0.2 & & & 4.95 & 25.5 &        \\
+                         & & & & & & & & 0.0 & & 4.67 & 25.3 &        \\
+                         & & & & & & & & 0.2 & & 5.47 & 25.7 &        \\
+      \midrule
+      (E) & \multicolumn{9}{c|}{positional embedding instead of sinusoids}& 4.92 & 25.7 &  \\
+      \midrule
+      big & 6 & 1024 & 4096 & 16 & & & 0.3 & & 300K & \textbf{4.33} & \textbf{26.4} & 213 \\
+
+
+      \bottomrule
+  \end{tabular}
+\end{table}
+
 表3の(A)行では,3.2.2節で述べた通り計算量を一定にしたまま,Multi-Head Attentionのheadsの数$h$,キーやキー値の次元$d_\mathrm{k}$,$d_\mathrm{v}$を変化させた結果を示している.$h=1$の時は,最適なパラメータ設定のときに比べ,0.9ほどBLEUスコアが低くなっており,$h=32$など多すぎる場合もスコアが低くなっている.\par
 (B)行では,Attentionのキーの次元$d_\mathrm{k}$の影響を観察した.結果として,優劣をつけるのは難しく,Scaled Dot-Product Attentionより良い変換関数があるかもしれない.(C),(D)行では,エンコーダー,デコーダーの層の数$N$,モデルの入出力の次元$d_\mathrm{model}$,Feed-Forward Networks内の次元$d_\mathrm{ff}$,DropoutやLabelSmoothingのパラメータ$P_{drop}$,$\epsilon_{ls} = 0.1$を変化させて実験を行った結果を示している.想定通り,パラメータを増やしモデルの規模を大きくするほどよい結果が得られ,またDropout処理は過学習を避けるために有効であった.行(E)では,本研究の正弦波を用いたpositional encodingを他の研究のpositional encodingと置き換えた結果を示しており,大きな違いは見られなかった.
 
 \section{Conclusion}
+本研究では,Transformerを提案した.Transformerは完全にAttentionのみに依存した最初のsequence transductionモデルであり,エンコーダー-デコーダーアーキテクチャで最も一般的なRNNレイヤーをmulti-headed self-attentionについて説明しこれまでのモデルと比較した利点を議論する置き換えたモデルである.\par
+翻訳タスクにおいて,TransformerはRNNやCNNレイヤーを基にしたアーキテクチャよりも遥かに早く学習が可能だある.WMT2014英独翻訳,WMT2014英仏翻訳タスクで最高記録を達成した.前者のタスクでは,過去のアンサンブルも含めた全てのモデルより高性能だった.\par
+Attentionを基としたモデルの未来には期待でき,他のタスクにも応用していく予定である.文章以外でも,画像,音声,映像といった大容量の入力にも対応できるようにしたい.
+学習に使用したコードは以下\par
+\url{https://github.com/tensorflow/tensor2tensor}
 
 
 %index.bibはtexファイルと同階層に置く
