@@ -46,82 +46,82 @@
   \hrule
   \vspace{3mm}
 
-\section*{Author}
+\section*{Authors}
 Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aiden N.Gomez, Lukasz Kaizer, Illia Polosukhin\cite{Transformer}
 
 \section*{Abstruct}
-今までの主要なsequence transduction modelは,エンコーダーとデコーダーを含む
-複雑なRNNやCNNに基づいていた.最も良いパフォーマンスであったモデルも,エンコーダーとデコーダーをアテンションの仕組みを用いて接続しているモデルであった.\par
-私達は,RNNやCNNを用いず,アテンションのみからなるTransformerと呼ばれる新しい簡潔なモデルを提案する.2回の翻訳実験の結果,Transformerは今までのモデルより優れており,更には,より並列化が可能で学習の時間も少ないことが分かった.
-TransformerはWMT2014英独翻訳タスクにおいて,「プロの翻訳者の訳と近ければ近いほどその機械翻訳の精度は高い」という考え方に基づく機械翻訳の評価方法であるBLEUスコア\cite{BLEU}で28.4BLEUを記録した.これは,複数のモデルを融合させて1つの学習モデルを生成するアンサンブル学習\cite{ensemble}を含めたこれまでの最高記録を2BLEU上回る結果であった.また、WMT2014英仏翻訳タスクにおいては、8個のGPUを用いた3.5日の学習というこれまでの最先端のモデルの学習よりも遥かに少ないコストで,41.0BLEUという単一モデルの最高記録を打ち立てた.
+今までの主要な系列変換モデルは,エンコーダとデコーダを含む
+複雑な RNN や CNN に基づいていた.最も良いパフォーマンスであったモデルも,エンコーダとデコーダを注意機構で接続しているモデルであった.\par
+私達は, RNN や CNN を用いず,注意機構のみからなる Transformer と呼ばれる新しい簡潔なモデルを提案する. 2 回の翻訳実験の結果, Transformer は今までのモデルより優れており,更には,より並列化が可能で学習の時間も少ないことが分かった.
+Transformer は WMT2014 英独翻訳タスクにおいて,「プロの翻訳者の訳と近ければ近いほどその機械翻訳の精度は高い」という考え方に基づく機械翻訳の評価方法である BLEU スコア\cite{BLEU}で 28.4BLEU を記録した.これは,複数のモデルを融合させて 1 つの学習モデルを生成するアンサンブル学習\cite{ensemble}を含めたこれまでの最高記録を 2BLEU 上回る結果であった.また, WMT2014 英仏翻訳タスクにおいては, 8 個の GPU を用いた 3日半の学習というこれまでの最先端のモデルの学習よりも遥かに少ない学習コストで, 41.0BLEU という単一モデルでの最高記録を打ち立てた.
 
-%TODO sequence transduction modelの自然な訳、時系列分析モデル?
+%sequence transduction model＝系列変換モデル　とした
 
 
 \section{Introduction}
-RNN,特にRNNにおいて文章の長期的な依存関係を学習できるようにしたLSTM\cite{LSTM}やgated RNN\cite{GRU}は,言語モデルや機械翻訳などのSequence 問題への最適な手法として確固たる地位を築いていた.
-それ以来,Recurrent言語モデルとエンコーダー-デコーダー構造の限界を押し上げる数々の努力がなされてきた.
+RNN, 特に RNN において文章の長期的な依存関係を学習できるようにした LSTM\cite{LSTM} やgated RNN \cite{GRU} は,言語モデルや機械翻訳などの系列変換問題への最適な手法として確固たる地位を築いていた.
+それ以来, RNN とエンコーダー-デコーダー構造の限界を押し上げる数々の努力がなされてきた.
 \par
-リカレントモデルでは,通常,入力と出力の時系列データの時間的な位置に沿って計算を行う.
-よって計算は逐次的に行われ,時刻$t$における隠れ状態$h_\mathrm{t}$は,時刻$t-1$の隠れ状態の$h_\mathrm{t-1}$と時刻$t$における入力から導かれる.
-このように本質的に逐次的な性質を孕んでいるため,学習の並列処理が困難である.そのため,メモリの制約上,長い時系列データなどの学習には致命的であった.
+RNN では,通常,入力と出力の時系列データの時間的な位置に沿って計算する.
+計算は逐次的に行われ,時刻 $t$ における隠れ状態 $h_\mathrm{t}$ は,時刻 $t-1$ の隠れ状態の $h_\mathrm{t-1}$ と時刻 $t$ における入力から導かれる.
+このように本質的に逐次的な性質を孕んでいるため,学習の並列処理が困難である.そのため,メモリの制約上,長い系列データなどの学習には致命的であった.
 直近の研究ではfactorization tricksやconditional computationといった方法で計算効率がかなり改善され,後者ではモデルの性能まで向上させることができたが,逐次的な計算の問題は残ったままだった.\par
-Attentionは入力と出力の時系列データにおける距離を気にせず依存関係をモデル化することができ,様々なタスクにおいて有効なsequence modelとtransduction modelの必要不可欠な部分となっている.しかし,一部の場合にはAttentionはRNNと合わせて用いられる.\par
-本研究で私達が提案するTransformerは,RNNを用いず,Attentionのみで入力と出力の完全な依存関係を取り出すモデルのアーキテクチャである.
-Transformerは学習の並列処理が可能であり,8個のP100 GPUで12時間という小規模な学習後に,最高の機械翻訳性能に達することができた.
+注意機構は入力と出力の系列データにおける距離を気にせず依存関係をモデル化することができ,様々なタスクにおいて有効な系列変換モデルにおける必要不可欠な部分となっている.しかし,一部の場合には注意機構は RNN と組み合わせて用いられる.\par
+本研究で私達が提案する Transformer は, RNN を用いず,注意機構のみで入力と出力の完全な依存関係を取り出すモデルのアーキテクチャである.
+ Transformer は学習の並列処理が可能であり, 8 個の P100 GPU で 12 時間という小規模な学習後に,過去最高の機械翻訳性能に達することができた.
 
 
 \section{BackGround}
-逐次的な計算を減らすという目標は,Extended Neural GPU,ByteNet,ConvS2Sといったモデルの基礎にもなっている.これらはどれもCNNを基本構成要素として,入力と出力のすべての位置で隠れ状態の値を計算する.またこれらのモデルにおいて,任意の入力の位置と出力の位置の信号を関連付けるために必要な計算時間は,ConvS2Sdでは線形的,ByteNetでは指数的となる.
+逐次的な計算を減らすという目標は, Extended Neural GPU, ByteNet, ConvS2S といったモデルの基礎にもなっている.これらはどれも CNN を基本構成要素として,入力と出力のすべての位置で隠れ状態の値を計算する.これらのモデルにおいて,任意の入力の位置と出力の位置の信号を関連付けるために必要な計算時間は, ConvS2Sd では線形的, ByteNet では指数的に増加する.
 そのため離れた位置の依存関係を学習することはより困難になる.
-Transformerでは,この計算時間を定数時間に減らすことができる.Attentionで重み付けした位置を平均化することで有効な解像度が下がってしまうが,3.2説で述べるMulti-Head Attentionにより相殺できる.\par
+ Transformer では,この処理を定数時間で計算できる.注意機構で重み付けした位置を平均化することで入力データに対する有効な解像度が下がってしまうが, 3.2 節で述べる多頭注意により相殺できる.\par
 
-intra-attentionとも呼ばれるSelf-Attentionは,単一の文章の異なる位置を関連付けるAttentionである.Self-Attentionは文章読解,要約,テキスト含意,独立した文の表現の学習などのタスクで用いられ成功している.\par
+内部注意とも呼ばれる自己注意は,単一系列内の異なる位置を参照し,類似度で重み付けを行うことで系列要素を関連付ける注意機構である.自己注意は文章読解,要約,テキスト含意,独立した文の表現の学習などのタスクで用いられ成功している.\par
 
-End-to-End memory NetworksはRNNの代わりに再帰的なAttentionを元にしており,単純な言語の質疑応答,言語モデリングといったタスクにおいて優れた結果を示している.\par
+End-to-End memory Networks は RNN の代わりに再帰的な Attention を元にしており,単純な言語の質疑応答,言語モデリングといったタスクにおいて優れた結果を示している.\par
 
-しかし私達が知る限り,TransformerはRNNやCNNを用いずに入出力の表現を計算するために,Self-Attentionのみに依存した最初のtransduction modelである.次節以降では,Transformer,self-attentionについて説明しこれまでのモデルと比較した利点を議論する.
+しかし私達が知る限り, Transformer は 入出力の表現を計算する際に, RNN や CNN を用いずに, 自己注意のみに依存した最初の系列変換モデルである.次節以降では,Transformer,自己注意について説明しこれまでのモデルと比較した利点を議論する.
 
 
 
 
 \section{Model Architecture}
-最も優位性のあるsequence transduction modelsはエンコーダー-デコーダー構造を有している.エンコーダーは配列で表現される入力($x_\mathrm{1}$,...,$x_\mathrm{n}$)を配列\bm{$z$}=($z_\mathrm{1}$,...,$z_\mathrm{n}$)に変換する.
-デコーダーは\bm{$z$}から出力として配列($y_\mathrm{1}$,...,$y_\mathrm{n}$)を1要素ずつ出力する.
-このステップで,モデルが生成する要素はこれまでに生成した要素のみに依存する自己回帰モデルであり,直前に生成された要素を新しく入力として次の要素を生成する.\par
-Transformerは図1の左半分と右半分に示すように,全体としてはエンコーダー-デコーダー構造を踏襲しつつ,self-attention層とpoint-wise全結合層を積み重ねた層を使用している.
+優位性のある系列変換モデルはエンコーダ-デコーダ構造を有している.エンコーダは配列で表現される入力 ($x_\mathrm{1}$,...,$x_\mathrm{n}$) を配列 \bm{$z$}=($z_\mathrm{1}$,...,$z_\mathrm{n}$) に変換する.
+デコーダは \bm{$z$} から出力として配列 ($y_\mathrm{1}$,...,$y_\mathrm{n}$) を 1 要素ずつ出力する.
+このステップで,このモデルは,新しく生成する要素はこれまでに生成した要素のみに依存する自己回帰モデル\cite{自己回帰モデル}であり,直前に生成された要素を新しく入力として次の要素を生成する.\par
+Transformer は図 1 に示すように,全体としてはエンコーダ-デコーダ構造を踏襲しつつ,自己注意層と point-wise 全結合層を積み重ねた層を使用している.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=100mm]{assets/Figure1.eps}
-  \caption{Transformerのモデルアーキテクチャ.}
+  \caption{ Transformer のモデルアーキテクチャ.}
   \label{Figure1}
 \end{figure}
 
 
 \subsection{Encoder and Decoder Stacks}
-エンコーダー: 6層からなり,各層は全く同じ構造である.それぞれの層は2つの下位層を持ち,下位層の後には残差接続や標準化が行われている.
-よって,下位層自身の出力をSublayer($x$)として,下位層全体としての出力はLayerNorm($x$+Sublayer($x$))となる.残差接続を容易にするために,すべての下位層,embedding layersも出力の次元を$d_\mathrm{model}$=512としている.\par
+\textbf{エンコーダ}: 6 層からなり,各層は全く同じ構造である.それぞれの層は 2 つの下位層を持ち,下位層の後には残差接続と標準化が行われている.
+よって,入力を $x$ , 下位層自身の出力を Sublayer($x$) として, 残差接続では $x+$Sublayer($x$) ,下位層全体としての出力は LayerNorm($x$+Sublayer($x$)) となる\cite{残差接続}.残差接続を容易にするために,すべての下位層, 埋め込み層は,出力の次元を $d_\mathrm{model}=512$としている.\par
 \par
-デコーダー: デコーダーも同一の6層からなる.エンコーダーの2つの下位層に加えて,エンコーダーの出力を入力として受ける3つ目の下位層を加えている.エンコーダーと同じく,下位層の後には残差接続や標準化が行われている.ただ,self-attention下位層は改良しており,後続の要素が影響しないようにしている.このマスキングと,出力が1要素ごと補われることを組み合わせることで,マスキングにより地点$i$での予測が地点$i$未満での既知の出力のみに依存することが保証される.
+\textbf{デコーダ}: デコーダも同一の 6 層からなる.エンコーダの持つ 2 つの下位層に加えて,エンコーダの出力を入力として受ける 3 つ目の下位層を加えている.エンコーダと同じく,下位層の後には残差接続や標準化が行われている.ただ, 自己注意層はエンコーダ層とは異なり,後続の要素を参照しないようにしている.このマスキングと,出力が 1 要素ごとnに補われていくことを組み合わせることで,マスキングにより地点 $i$ での予測が地点 $i$ 未満での既知の出力のみに依存することが保証される.
 
 \subsection{Attention}
-アテンションの仕組みは,クエリとキーとキー値のセットを出力へマッピングし,クエリやキー,キー値,出力はすべてベクトルである.出力はキー値の重み付き和として計算され,それぞれのキー値へ割り当てられる重みはクエリとクエリに対応するキーからの変換関数で計算される.
+注意機構はクエリとキーとキー値のセットを出力へマッピングする機構である.ここで,クエリやキー,キー値,出力はすべてベクトルである.出力はキー値の重み付き和として計算され,それぞれのキー値への重みはクエリとクエリに対応するキーからの変換関数で計算される.
 
 \subsubsection{Scaled Dot-Product Attention}
-私が独自に考案したアテンションを"Scaled Dot-Product Attention"と呼ぶ.図2にScaled Dot-Product Attentionのアーキテクチャを示す.\par
+本研究で独自に考案した注意機構を"標準化内積注意"と呼ぶ.図2に標準化内積注意のアーキテクチャを示す.\par
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=100mm]{assets/Figure2.eps}
 
-  \caption{(左)Scaled Dot-Product Attention. (右)複数のアテンション層が並列に構成されているMulti-Head Attention.}
+  \caption{(左)標準化内積注意. (右)複数の注意機構層が並列に構成されている多頭注意.}
   \label{Figure2}
 \end{figure}
 
 
-入力はクエリと次元$d_\mathrm{k}$のキー,次元$d_\mathrm{v}$のキー値からなる.クエリとキーの内積を計算し,それを$\sqrt{d_\mathrm{k}}$で割り,キー値の重みを得るためにsoftmax関数を適用する.
-実際にはクエリを行列$Q$としてまとめて同時に計算している.キーやキー値も同様に行列$K$,$V$にまとめて計算している.行列による出力は(1)式のように表せる.
+入力はクエリと次元$d_\mathrm{k}$のキー,次元$d_\mathrm{v}$のキー値からなる.クエリとキーの内積を計算し,それを$\sqrt{d_\mathrm{k}}$で割り,softmax関数を適用しキー値の重みを得る.
+実際にはクエリ,キーやキー値を行列 $Q$, $K$, $V$にまとめて計算している.行列による注意機構の出力は(1)式のように表せる.
 
 \begin{equation}
   \mathrm{Attention}(Q,K,V) = \mathrm{softmax}(\frac{QK^T}{\sqrt{d_\mathrm{k}}})V
@@ -129,62 +129,63 @@ Transformerは図1の左半分と右半分に示すように,全体としては�
 
 \par
 
-最も一般的に利用されるAttentionとしてはadditive attentionとdot-product attentionの2つがある.Dot-product attentionは,Scaled Dot-Product Attentionから$\sqrt{d_\mathrm{k}}$で割る処理を除いたものである.Additive attentionは一つの隠れ層を持つfeed-forward networkを用いて変換関数を計算している.2つのAttentionは理論的には似ているが,高度に最適化された行列積のコードを内包しているためdot-product attentionのほうが計算が遥かに早く,メモリ効率も良い.\par
-$d_\mathrm{k}$が小さい値である時はこの2つのAttentionは同様に作用するが,$d_\mathrm{k}$が大きい値である時には,Additive attentionは標準化をしないdot-product attentionより性能が良くなる.私達は,$d_\mathrm{k}$が大きい値である時に,内積の値が急激に増加し,softmax関数の勾配消失が起こると考え,それを防ぐために内積を$\frac{1}{\sqrt{d_\mathrm{k}}}$で標準化している.
+最も一般的に利用される注意機構としては加法注意と内積注意の2つがある.内積注意は,標準化内積注意から $\sqrt{d_\mathrm{k}}$ で割る処理を除いたものである.加法注意は一つの隠れ層を持つ feed-forward network を用いて変換関数を計算している.2つの注意機構は理論的には似ているが,高度に最適化された行列積のコードを内包しているため内積注意のほうが計算が遥かに早く,メモリ効率も良い.\par
+$d_\mathrm{k}$ が小さい値である時はこの 2 つの注意機構は同様に作用するが, $d_\mathrm{k}$ が大きい値である時には,加法注意は標準化をしない内積注意より性能が良くなる. 標準化内積注意では, $d_\mathrm{k}$ が大きい値である時に,内積の値が急激に増加し, softmax 関数の勾配消失が起こると考え,それを防ぐために内積を $\frac{1}{\sqrt{d_\mathrm{k}}}$ で標準化している.
 
 \subsubsection{Multi-Head Attention}
-次元$d_\mathrm{model}$におけるキーとキー値とクエリを用いた単一のattention関数を使用する代わりに,クエリとキーとキー値に$h$回線形射影を行い,次元を$d_\mathrm{k}$,$d_\mathrm{k}$,$d_\mathrm{v}$にそれぞれ削減したほうが都合が良いと判明した.
-射影したクエリ,キー,キー値それぞれに対して,Attention関数を並列に実行し,次元$d_\mathrm{v}$の出力を得る.それらをConcat層で連結し,もう一度線形射影して最終的な出力を得る.図2にこの一連の過程を示す.
+次元 $d_\mathrm{model}$ におけるキーとキー値とクエリを用いた単一の注意関数を使用する代わりに,クエリとキーとキー値に $h$ 回それぞれ異なる変換が学習されている線形変換をし,次元を $d_\mathrm{k}$, $d_\mathrm{k}$, $d_\mathrm{v}$にそれぞれ削減したほうが都合が良いと判明した.
+射影したクエリ,キー,キー値それぞれに対して,注意関数を並列に実行し,次元 $d_\mathrm{v}$ の出力を得る.それらを Concat 層で連結し,もう一度線形射影して最終的な出力を得る.図 2 にこの一連の過程を示す.
 \par
-Multi-Head Attentionにより,異なる要素の異なる部分ベクトル空間を見ることができる.single attention headでは,平均化によりこのようなことはできない.
+多頭注意により,異なる要素の異なる部分ベクトル空間を見ることができ,結果として表現力が高まる.\cite{Multihead}単頭注意では,このようなことはできない.
 \par
+
 \begin{eqnarray*}
   \mathrm{MultiHead}(Q,K,V)&  = & \mathrm{Concat}(head_\mathrm{1},...,head_\mathrm{h})W^O   \\
   ここで, head_\mathrm{i} & = & \mathrm{Attention}(QW_\mathrm{i}^Q,KW_\mathrm{i}^K,VW_\mathrm{i}^V)
 \end{eqnarray*}
 
 射影関数のパラメータの行列は,
-$W_\mathrm{i}^Q \in \mathbb{R} ^ {{d_\mathrm{model}} \times {d_\mathrm{k}}}$,\par
+$W_\mathrm{i}^Q \in \mathbb{R} ^ {{d_\mathrm{model}} \times {d_\mathrm{k}}}$,
 $W_\mathrm{i}^K \in \mathbb{R} ^ {{d_\mathrm{model}} \times {d_\mathrm{k}}}$,
 $W_\mathrm{i}^V \in \mathbb{R} ^ {{d_\mathrm{model}} \times {d_\mathrm{v}}}$と\par
 $W_\mathrm{i}^O \in \mathbb{R} ^ {{hd_\mathrm{v}} \times {d_\mathrm{model}}}$である.
 
-本研究では,$h=8$の並列のattention層を用いて,次元を
-$d_\mathrm{k} = d_\mathrm{v} = d_\mathrm{model}/h = 64$とした.
-次元の削減により,総計算コストを,次元の削減を行わなかった場合の単一のattentionと同等まで削減することができた.
+本研究では, $h=8$ の並列の標準化内積注意層を用いて,次元を
+ $d_\mathrm{k} = d_\mathrm{v} = d_\mathrm{model}/h = 64$ とした.
+次元の削減により,総計算コストを,次元の削減を行わなかった場合の単頭注意と同等まで削減することができた.
 
 \subsubsection{Applications of Attention in our Model}
-Transformerでは,multi-head attentionを以下の3つの方法で採用している.
+Transformer では,多頭注意を以下の 3 つの方法で採用している.
 \begin{itemize}
-  \item "encoder-decoder attention"層では,クエリは直前のデコーダー層から生まれ,キーとキー値はエンコーダーの出力から生まれる.デコーダー内のすべての要素が入力文のすべての要素を見ることができる.これは,sequence to sequenceモデルの典型的なencoder-decoder attentionを模倣している.
-  \item エンコーダはself-attention層を含んでいる.self-attention層では,キー,キー値,クエリの全てが,エンコーダー内の一つ前の層の出力から生まれている.エンコーダー内のそれぞれの要素は,エンコーダーの一つ前の層の,その要素までの全ての要素を見ることができる.
-  \item 同様に,デコーダー内のself-attention層も,デコーダーの全層の要素を参照することができるが,自動回帰的な特性を保持するために,左向きへの情報の流出を防がなければならない.すなわち,翻訳済の単語に影響が出ないようにしなければ行けない.私達はscaled dot-product attentionの中で,不当な接続に相当する部分を-$\infty$にマスキングして,softmax層の入力として与えることで,これを実現している.図2にこの過程を示している.
+  \item "エンコーダ-デコーダ注意層"では,クエリはデコーダにおける直前の層から生まれ,キーとキー値はエンコーダの出力から生まれる.デコーダ内のすべての要素が入力文のすべての要素を見ることができる.すなわち系列間のトークン表現間で注意処理を行う.これは, seq2seq モデルの典型的なエンコーダ-デコーダ注意機構を模倣している.
+  \item エンコーダにおける自己注意層では,キー,キー値,クエリの全てが,一つ前のエンコーダ層の出力から生まれている.エンコーダ内の系列内のそれぞれの要素は,エンコーダの一つ前の層の出力の系列内の全ての要素を参照することができる.
+  \item 同様に,デコーダ内の自己注意層も,デコーダの全層の要素を参照することができるが,自動回帰的な特性を保持するために,左向きへの情報の流出を防がなければならない.すなわち,翻訳済の単語に影響が出ないようにしなければ行けない.本研究では標準化内積注意の中で,不当な接続に相当する部分を-$\infty$にマスキングして, softmax 層の入力として与えることで,これを実現している.図 2 にこの過程を示している.
 \end{itemize}
 
 \subsection{Position-wise Feed-Forward Networks}
-Attentionの下位層に加えて,エンコーダーとデコーダーのそれぞれの層には,完全に連結したfeed-forward networkが含まれている.feed-forward networkは,2つの線形変換の間にReLU関数を適用した形となっている.
+注意層に加えて,エンコーダとデコーダ内のそれぞれの層には,完全に連結した feed-forward network が含まれている. feed-forward network は,2つの線形変換の間に ReLU 関数を適用した形となっている.
 
 \begin{equation}
   \mathrm{FFN}(x) = \mathrm{max}(0,xW_\mathrm{1}+b_\mathrm{1})W_\mathrm{2} + b_\mathrm{2}
 \end{equation}
 
-線形変換は異なる要素に対しても同じ値を掛けるのに対して,層を変えることに異なるパラメータを用いる.言い換えると,カーネルサイズが1の2つの畳み込みとして捉えることができる.
-入出力の次元は$d_\mathrm{model} = 512$とし,feed-forward network内では次元は$d_\mathrm{ff} = 2048$としている.
+線形変換は入力の異なる要素に対しても同じ値を掛けるのに対して,線形層ごとに異なる値のパラメータを用いる.言い換えると,カーネルサイズが 1 の 2 つの畳み込みとして捉えることができる.
+入出力の次元は $d_\mathrm{model} = 512$ とし, feed-forward network 内では次元は $d_\mathrm{ff} = 2048$ としている.
 
 \subsection{Embeddings and Softmax}
-他のsequence transduction modelと同様に,学習済みのembeddingを用いて入力と出力のトークンを次元$d_\mathrm{model}$のベクトルに変換する.また,一般的な学習済みの線形変換とsoftmax関数を用いてデコーダーの出力を予測済みのnext-tokenの予測確率に変換している.私達のモデルは,2つのembedding層とsoftmax層の前の線形変換で同じ重み行列を使用している.また,embedding層では$\sqrt{d_\mathrm{model}}$を掛けている.
+他の系列変換モデルと同様に,学習済みの埋め込み層を用いて入力と出力のトークンを次元 $d_\mathrm{model}$ のベクトルに変換する.また,一般的な学習済みの線形変換と softmax 関数を用いて,デコーダの出力を予測済みのトークンの確率に変換している. Transformer は, 2 つの埋め込み層と softmax 層の前の線形変換で同じ重み行列を使用している.また,埋め込み層では $\sqrt{d_\mathrm{model}}$ を掛けている.
 
 \subsection{Positional Encoding}
-私達のモデルはRNNやCNNを含んでいないため,モデルが要素の順番を利用するために,絶対的であれ,相対的であれ何らかの要素の順番の情報を定義する必要があった.結果として,"positional encoder"を入力のembedding層に付け加え,エンコーダーとデコーダーの最下層に入れることとした.embedding層との加算を行うために,positional encodingの次元はembeddingと同じ$d_\mathrm{model}$とした.\par
-本研究では,positional encodingとして別々の周波数を持つsin関数,cos関数を用いた.
+私達のモデルは RNN や CNN を含んでいないため,モデルが系列内の要素の順番を利用するために,絶対的であれ,相対的であれ何らかの要素の順番の情報を定義する必要があった.結果として, "positional encoder" を入力の埋め込み層に付け加え,エンコーダとデコーダの最下層に入れることとした.埋め込み層との加算を行うために, positional encoding の次元は埋め込みそうと同じ $d_\mathrm{model}$ とした.\par
+本研究では, positional encoding として別々の周波数を持つ sin 関数, cos 関数を用いた.
 
 \begin{eqnarray*}
   PE_{(pos,2i)} &= &sin(pos/10000^{2i/d_\mathrm{model}}) \\
   PE_{(pos,2i+1)} &= &cos(pos/10000^{2i/d_\mathrm{model}})
 \end{eqnarray*}
 
-ここで,$pos$は要素の位置,$i$は次元である.つまり,position encodingのそれぞれの次元は正弦波に該当する.波長は$2\pi$から$10000・2\pi$まで段階的に増加していく.この関数を採用した理由は,モデルが相対的な位置から参照できるように簡単に学習できると仮設を立てたためである.なぜなら,任意の定数オフセット$k$において,$PE_{pos+k}$は$PE_{pos}$の線形関数として表すことができるからだ.\par
-別の論文の学習済みのpositional embeddingを用いた実験を行ったところ,本論文と別論文の結果はほぼ等しくなった.そこで,学習時よりもより長いデータに対しても対応できると判断し正弦波verを採用した.
+ここで, $pos$ は要素の位置, $i$ は次元である.つまり, position encoding のそれぞれの次元は正弦波に該当する.波長は $2\pi$ から $10000・2\pi$ まで段階的に増加していく.この関数を採用した理由は,モデルが系列の要素の相対的な位置を簡単に学習できると仮説を立てたためである.なぜなら,任意の定数オフセット $k$ において, $PE_{pos+k}$ は $PE_{pos}$ の線形関数として表すことができるからだ.\par
+別の論文の学習済みの positional embedding を用いた実験をしたところ,本論文と別論文の結果はほぼ等しくなった.そこで,本研究の正弦波を用いた方法が学習時よりもより長いデータに対しても対応できると判断し採用した.
 
 
 \section{Why Self-Attention}
