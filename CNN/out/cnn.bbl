@@ -1,0 +1,30 @@
+\begin{thebibliography}{1}
+
+\bibitem{1}
+Richard~O. Duda and Peter~E. Hart.
+\newblock Pattern classification and scene analysis.
+\newblock In {\em A Wiley-Interscience publication}, 1973.
+
+\bibitem{2}
+Y.~LeCun, B.~Boser, J.~S. Denker, D.~Henderson, R.~E. Howard, W.~Hubbard, and
+  L.~D. Jackel.
+\newblock Backpropagation applied to handwritten zip code recognition.
+\newblock {\em Neural Computation}, Vol.~1, No.~4, pp. 541--551, 1989.
+
+\bibitem{3}
+H.~S. Seung, H.~Sompolinsky, and N.~Tishby.
+\newblock Statistical mechanics of learning from examples.
+\newblock {\em Phys. Rev. A}, Vol.~45, pp. 6056--6091, Apr 1992.
+
+\bibitem{4}
+Vladimir Vapnik, Esther Levin, and Yann Lecun.
+\newblock Measuring the vc-dimension of a learning machine.
+\newblock {\em Neural Computation}, Vol.~6, pp. 851--876, 09 1994.
+
+\bibitem{5}
+Corinna Cortes, L.~D. Jackel, Sara Solla, Vladimir Vapnik, and John Denker.
+\newblock Learning curves: Asymptotic values and rate of convergence.
+\newblock In J.~Cowan, G.~Tesauro, and J.~Alspector, editors, {\em Advances in
+  Neural Information Processing Systems}, Vol.~6. Morgan-Kaufmann, 1993.
+
+\end{thebibliography}
